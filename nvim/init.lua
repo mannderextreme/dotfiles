@@ -728,12 +728,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -741,8 +741,11 @@ require('lazy').setup({
       -- Adds other completion capabilities.
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-nvim-lsp', -- LSP completion source
+      'hrsh7th/cmp-buffer', -- Buffer completion source
+      'hrsh7th/cmp-path', -- File path completion source
+      'hrsh7th/cmp-cmdline', -- Command-line completion source
+      'L3MON4D3/LuaSnip',
     },
     config = function()
       -- See `:help cmp`
