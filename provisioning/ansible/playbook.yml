@@ -1,0 +1,80 @@
+---
+- hosts: localhost
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Install required packages on Ubuntu/Debian
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - alacritty
+        - i3
+        - stow
+        - picom
+        - polybar
+        - tmux
+        - unzip
+      ignore_errors: true
+
+    - name: Install Starship shell prompt via curl
+      shell: |
+        curl -sS https://starship.rs/install.sh -y | sh
+
+    - name: Check if Neovim is installed
+      command: which nvim
+      register: neovim_installed
+      ignore_errors: true
+
+    - name: Install Neovim via curl if not installed
+      shell: |
+        curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz
+        tar xzf nvim-linux64.tar.gz
+        sudo mv nvim-linux64/bin/nvim /opt/nvim-linux64/bin
+        sudo chmod +x /opt/nvim-linux64/bin/nvim  # Correct permissions for the binary
+        rm -rf nvim-linux64 nvim-linux64.tar.gz
+      when: neovim_installed.rc != 0
+
+    - name: Ensure .bashrc is updated with Neovim path
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: 'export PATH="$PATH:/opt/nvim-linux64/bin"'
+        state: present
+
+    - name: Reload shell configuration (for immediate use)
+      shell: |
+        source "{{ ansible_env.HOME }}/.bashrc"
+      args:
+        executable: /bin/bash
+
+    - name: Download Nerd Fonts
+      get_url:
+        url: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/UbuntuMono.zip"  # Change to your preferred font
+        dest: "/tmp/nerd-fonts.zip"
+
+    - name: Create fonts directory
+      file:
+        path: "{{ ansible_env.HOME }}/.local/share/fonts"
+        state: directory
+
+    - name: Unzip Nerd Fonts
+      unarchive:
+        src: "/tmp/nerd-fonts.zip"
+        dest: "{{ ansible_env.HOME }}/.local/share/fonts"
+        remote_src: yes
+
+    - name: Update font cache
+      command: fc-cache -f -v
+
+  
+    - name: Create .config directory
+      ansible.builtin.file:
+        path: "{{ lookup('env', 'HOME') }}/.config"
+        state: directory
+
+    - name: Execute stow
+      shell: |
+        cd "{{ lookup('env', 'HOME') }}/dotfiles/stow_source" && stow . -t "{{ lookup('env', 'HOME') }}/.config"
+      become: true
+      become_user: "{{ ansible_env.USER }}"
