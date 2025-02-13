@@ -1,0 +1,31 @@
+font=Cozette 11
+format=<b>%a ⏵</b> %s\n%b
+sort=-time
+output=DP-2
+layer=overlay
+anchor=bottom-center
+width=300
+height=110
+margin=5
+padding=0,5,10
+border-size=2
+border-radius=15
+icons=0
+max-icon-size=64
+default-timeout=3000
+ignore-timeout=1
+background-color=#1e1e2e
+text-color=#cdd6f4
+border-color=#89b4fa
+progress-color=over #313244
+
+[urgency=normal]
+
+[urgency=high]
+border-color=#fab387
+default-timeout=0
+
+[app-name=lightcord]
+
+[app-name=lightcord summary~="(.*(^| )orz|ORZ|sto|STO|otl|OTL( |$).*)"]
+invisible=1
